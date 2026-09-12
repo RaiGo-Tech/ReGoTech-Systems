@@ -1,12 +1,14 @@
 import './App.css'
+import { useEffect, useState } from 'react'
+import ContactForm from './components/contact/ContactForm'
 
 const navItems = ['Services', 'Why Us', 'Process', 'Portfolio', 'Testimonials']
 
 const metrics = [
-  { value: '120+', label: 'Projects delivered' },
-  { value: '92%', label: 'Client retention' },
-  { value: '24/7', label: 'Support availability' },
-  { value: '8 yrs', label: 'Industry experience' },
+  { value: 120, suffix: '+', label: 'Projects delivered' },
+  { value: 92, suffix: '%', label: 'Client retention' },
+  { value: 24, suffix: '/7', label: 'Support availability' },
+  { value: 8, suffix: ' yrs', label: 'Industry experience' },
 ]
 
 const services = [
@@ -70,16 +72,25 @@ const projects = [
     name: 'Nexa Commerce',
     outcome: 'Boosted online sales by 41% with a redesigned e-commerce platform.',
     type: 'E-commerce transformation',
+    metric: '+41% sales uplift',
+    gradient: 'linear-gradient(135deg, rgba(124, 58, 237, 0.88), rgba(34, 211, 238, 0.7))',
+    tags: ['UX', 'Checkout', 'Growth'],
   },
   {
     name: 'Aural Insights',
     outcome: 'Automated reporting workflows and cut operational overhead by 38%.',
     type: 'Data & automation',
+    metric: '38% faster ops',
+    gradient: 'linear-gradient(135deg, rgba(14, 165, 233, 0.82), rgba(45, 212, 191, 0.7))',
+    tags: ['Automation', 'Insights', 'Dashboard'],
   },
   {
     name: 'PrimeOps Cloud',
     outcome: 'Modernized infrastructure to improve uptime, reduce costs, and simplify deployment.',
     type: 'Cloud migration',
+    metric: '99.9% uptime',
+    gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(168, 85, 247, 0.72))',
+    tags: ['Cloud', 'DevOps', 'Reliability'],
   },
 ]
 
@@ -98,11 +109,89 @@ const testimonials = [
   },
 ]
 
+const companyHighlights = [
+  {
+    title: 'Strategy-led delivery',
+    text: 'We align product vision, customer needs, and revenue goals before a single line of code is written.',
+  },
+  {
+    title: 'Production-ready engineering',
+    text: 'Every platform is built with performance, stability, security, and maintainability in mind.',
+  },
+  {
+    title: 'Growth-focused design',
+    text: 'Our UX systems are designed to increase confidence, reduce friction, and support conversion.',
+  },
+]
+
 const technologies = ['React', 'Node.js', 'Azure', 'AWS', 'AI', 'Design Systems', 'Security', 'Automation']
 
+const industries = ['Startups', 'SaaS', 'Healthcare', 'Fintech', 'E-commerce', 'Agencies']
+
+function AnimatedCounter({ value, suffix }) {
+  const [displayValue, setDisplayValue] = useState(0)
+
+  useEffect(() => {
+    let animationFrameId = null
+    let startTime = null
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp
+
+      const progress = Math.min((timestamp - startTime) / 1200, 1)
+      const easedProgress = 1 - Math.pow(1 - progress, 3)
+      const nextValue = Math.round(value * easedProgress)
+
+      setDisplayValue(nextValue)
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(animate)
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [value])
+
+  return <strong>{displayValue}{suffix}</strong>
+}
+
 function App() {
+  const [theme, setTheme] = useState('dark')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem('regotech-theme')
+
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      setTheme(savedTheme)
+    }
+  }, [])
+
+  useEffect(() => {
+    document.body.dataset.theme = theme
+    document.body.style.colorScheme = theme
+    window.localStorage.setItem('regotech-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
-    <div className="page-shell">
+    <div className={`page-shell ${theme === 'light' ? 'theme-light' : ''}`}>
       <header className="topbar">
         <div className="brand-wrap">
           <div className="brand-mark">R</div>
@@ -112,23 +201,56 @@ function App() {
           </div>
         </div>
 
-        <nav className="nav" aria-label="Main navigation">
+        <nav className={`nav ${isMobileMenuOpen ? 'open' : ''}`} aria-label="Main navigation">
           {navItems.map((item) => (
-            <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}>
+            <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} onClick={() => setIsMobileMenuOpen(false)}>
               {item}
             </a>
           ))}
         </nav>
 
-        <a className="primary-button small" href="#contact">
-          Book a Call
-        </a>
+        <div className="topbar-actions">
+          <button
+            type="button"
+            className={`theme-toggle ${theme === 'light' ? 'light' : ''}`}
+            onClick={() => setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))}
+            aria-label="Toggle dark and light theme"
+          >
+            <span className="theme-toggle-track">
+              <span className="theme-toggle-icon sun" aria-hidden="true">
+                ☀
+              </span>
+              <span className="theme-toggle-icon moon" aria-hidden="true">
+                ☾
+              </span>
+              <span className="theme-toggle-thumb" />
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className="mobile-menu-button"
+            aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+
+          <a className="primary-button small" href="#contact">
+            Book a Call
+          </a>
+        </div>
       </header>
 
       <main>
         <section className="hero-section">
           <div className="hero-copy">
             <p className="eyebrow">Premium technology partner for ambitious brands</p>
+            <div className="hero-badges">
+              <span className="hero-badge">Available for Q4 launches</span>
+              <span className="hero-badge alt">8+ years of digital delivery</span>
+            </div>
             <h1>
               We build <span>smarter digital systems</span> that help businesses grow faster.
             </h1>
@@ -149,7 +271,7 @@ function App() {
             <div className="metrics-row">
               {metrics.map((metric) => (
                 <div className="metric-card" key={metric.label}>
-                  <strong>{metric.value}</strong>
+                  <AnimatedCounter value={metric.value} suffix={metric.suffix} />
                   <span>{metric.label}</span>
                 </div>
               ))}
@@ -209,6 +331,42 @@ function App() {
           <div className="logo-row">
             {['Startups', 'Scale-ups', 'SaaS', 'Agencies', 'Enterprises'].map((item) => (
               <div key={item}>{item}</div>
+            ))}
+          </div>
+        </section>
+
+        <section className="industry-strip" aria-label="Industries served">
+          <p className="eyebrow">Industries we power</p>
+          <div className="industry-list">
+            {industries.map((item) => (
+              <div key={item} className="industry-item">
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="capabilities-section">
+          <div className="section-header narrow">
+            <p className="eyebrow">Built for momentum</p>
+            <h2>We combine product thinking, engineering expertise, and premium design execution.</h2>
+          </div>
+
+          <div className="capabilities-grid">
+            {companyHighlights.map((highlight) => (
+              <div className="highlight-card" key={highlight.title}>
+                <div className="highlight-icon">✦</div>
+                <h3>{highlight.title}</h3>
+                <p>{highlight.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="tech-stack" aria-label="Technology stack and capabilities">
+            {technologies.map((tech) => (
+              <span key={tech} className="tech-pill">
+                {tech}
+              </span>
             ))}
           </div>
         </section>
@@ -281,9 +439,18 @@ function App() {
           <div className="projects-grid">
             {projects.map((project) => (
               <article className="project-card" key={project.name}>
-                <div className="project-visual" aria-hidden="true" />
+                <div className="project-visual" aria-hidden="true" style={{ background: project.gradient }}>
+                  <div className="project-visual-overlay">
+                    <span className="project-badge">{project.type}</span>
+                    <strong className="project-metric">{project.metric}</strong>
+                  </div>
+                </div>
                 <div className="project-content">
-                  <span>{project.type}</span>
+                  <div className="project-tags">
+                    {project.tags.map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
                   <h3>{project.name}</h3>
                   <p>{project.outcome}</p>
                 </div>
@@ -314,14 +481,48 @@ function App() {
           </div>
         </section>
 
-        <section id="contact" className="cta-panel">
+        <section className="cta-banner">
           <div>
+            <p className="eyebrow">Need a stronger digital edge?</p>
+            <h2>Turn strategy into a premium product experience that customers trust and teams love.</h2>
+          </div>
+          <a className="primary-button" href="#contact">
+            Schedule a Discovery Call
+          </a>
+        </section>
+
+        <section id="contact" className="contact-section">
+          <div className="section-header narrow">
             <p className="eyebrow">Let’s build something strong</p>
             <h2>Ready to elevate your digital presence with ReGoTech Systems?</h2>
           </div>
-          <a className="primary-button" href="mailto:hello@regotechsystems.com">
-            hello@regotechsystems.com
-          </a>
+
+          <div className="contact-layout">
+            <div className="contact-details">
+              <h3>Tell us about your next project</h3>
+              <p>
+                We help brands turn ideas into digital systems that feel premium, build trust, and
+                scale with confidence.
+              </p>
+
+              <div className="contact-list">
+                <div className="contact-item">
+                  <span>Email</span>
+                  <a href="mailto:hello@regotechsystems.com">hello@regotechsystems.com</a>
+                </div>
+                <div className="contact-item">
+                  <span>Response time</span>
+                  <strong>Within 24 hours</strong>
+                </div>
+                <div className="contact-item">
+                  <span>Focus</span>
+                  <strong>Strategy, Design, Engineering, Growth</strong>
+                </div>
+              </div>
+            </div>
+
+            <ContactForm />
+          </div>
         </section>
       </main>
 
