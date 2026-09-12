@@ -1,6 +1,8 @@
 import './App.css'
 import { useEffect, useState } from 'react'
 import ContactForm from './components/contact/ContactForm'
+import darkLogo from './assets/logos/ReGoTech.png'
+import lightLogo from './assets/logos/ReGoTech2.png'
 
 const navItems = ['Services', 'Why Us', 'Process', 'Portfolio', 'Testimonials']
 
@@ -194,7 +196,11 @@ function App() {
     <div className={`page-shell ${theme === 'light' ? 'theme-light' : ''}`}>
       <header className="topbar">
         <div className="brand-wrap">
-          <div className="brand-mark">R</div>
+          <img
+            className="brand-logo"
+            src={theme === 'light' ? lightLogo : darkLogo}
+            alt="ReGoTech Systems logo"
+          />
           <div>
             <div className="brand-name">ReGoTech Systems</div>
             <div className="brand-tag">Digital Growth Studio</div>

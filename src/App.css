@@ -103,17 +103,13 @@ body[data-theme='light'] .topbar {
   gap: 14px;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
+.brand-logo {
   width: 42px;
   height: 42px;
+  object-fit: contain;
   border-radius: 14px;
-  background: linear-gradient(135deg, #7c3aed 0%, #22d3ee 100%);
-  color: #f8fafc;
-  font-size: 1.1rem;
-  font-weight: 800;
-  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.28);
 }
 
 .brand-mark.small {
